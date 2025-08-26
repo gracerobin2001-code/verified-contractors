@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verified Contractors — Coming Soon</title>
+
+  <!-- CONFIG -->
+  <script>
+    const MAILCHIMP_URL = '';
+    const MAILCHIMP_REDIRECT = 'http://localhost:8000/';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyfO3R4WBzNAGrhlmQHgwxA9ixjGP17TfKL6yH1VBv8fcXJoVopHP3dbDAnAgYKMXnP/exec';
+    const RECAPTCHA_SITE_KEY = ''; // optional
+  </script>
+
+  <link rel="icon" href="favicon.ico" />
+  <meta name="description" content="AI previews + verified local contractors — request early access to get quotes.">
+
+  <!-- GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8ZEHM5VFDF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-8ZEHM5VFDF');
+  </script>
+
+  <style>
+    :root{--blue:#0A66FF;--muted:#666;--light:#F5F5F5}
+    body{font-family:Inter,Segoe UI,Arial,sans-serif;margin:0;background:var(--light);color:#111}
+    .wrap{max-width:1100px;margin:36px auto;padding:0 20px}
+    header.hero{display:flex;gap:28px;align-items:flex-start}
+    .left{flex:1}
+    h1{font-size:36px;margin:0 0 12px}
+    p.lead{color:#444;margin:0 0 18px;font-size:16px}
+    .cta-row{display:flex;gap:12px;margin-bottom:14px}
+    .btn{padding:12px 20px;border-radius:10px;border:0;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+    .btn-primary{background:var(--blue);color:#fff}
+    .btn-ghost{background:#fff;border:1px solid var(--blue);color:var(--blue)}
+    .form{display:block;background:#fff;padding:14px;border-radius:10px;border:1px solid #e6e6e6}
+    .form-row{display:flex;gap:8px;margin-bottom:8px}
+    .form-row .col{flex:1}
+    input, select, textarea{width:100%;padding:10px;border:1px solid #e6e6e6;border-radius:8px;font-size:14px}
+    textarea{min-height:72px;resize:vertical}
+    label{font-size:13px;color:#444;margin-bottom:6px;display:block}
+    .mock{width:360px;height:220px;border-radius:10px;border:1px solid #E6E6E6;background:#fff;display:flex;align-items:center;justify-content:center;color:#999}
+    .features{display:flex;gap:16px;margin:28px 0}
+    .feature{flex:1;background:#fff;border:1px solid #E6E6E6;border-radius:8px;padding:14px}
+    .small{font-size:13px;color:#666}
+    footer{margin-top:28px;color:#666;font-size:13px}
+    .admin{margin-top:18px;background:#fff;border:1px solid #E6E6E6;padding:12px;border-radius:8px}
+    .hidden{display:none !important}
+    table{border-collapse:collapse;width:100%}
+    table th, table td{padding:6px 8px;border-bottom:1px solid #eee;text-align:left}
+    pre.snip{background:#f7f7f7;padding:10px;border-radius:6px;max-height:240px;overflow:auto}
+    .admin-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .msg-success{color:green;margin-left:8px}
+    .spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;animation:spin 1s linear infinite;display:inline-block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:900px){header.hero{flex-direction:column}.mock{width:100%;height:200px}}
+  </style>
+
+  <script>
+    if (typeof RECAPTCHA_SITE_KEY !== 'undefined' && RECAPTCHA_SITE_KEY) {
+      const s = document.createElement('script');
+      s.src = 'https://www.google.com/recaptcha/api.js';
+      document.head.appendChild(s);
+    }
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="left">
+        <h1 id="hero-headline">See what your home could look like — get real contractor quotes</h1>
+        <p class="lead" id="hero-sub">We generate AI previews of upgrades, collect homeowner interest, then send packaged job orders to verified local contractors who bid. Join early access for homeowners or contractors in your area.</p>
+
+        <div class="cta-row">
+          <button class="btn btn-primary" id="btn-homeowner">I'm a Homeowner</button>
+          <button class="btn btn-ghost" id="btn-contractor">I'm a Contractor</button>
+        </div>
+
+        <div style="margin-top:14px">
+          <div class="form" id="signup-form">
+            <div style="margin-bottom:8px"><strong>Join early access — no spam. We’ll email next steps.</strong></div>
+
+            <label for="role">I am a</label>
+            <select id="role" aria-label="Role">
+              <option value="homeowner">Homeowner</option>
+              <option value="contractor">Contractor</option>
+            </select>
+
+            <div class="form-row" style="margin-top:8px">
+              <div class="col"><label for="name">Name</label><input id="name" placeholder="Your full name" autocomplete="name" /></div>
+              <div class="col"><label for="email">Email</label><input id="email" type="email" placeholder="you@example.com" autocomplete="email" /></div>
+            </div>
+
+            <div class="form-row">
+              <div class="col"><label for="zip">ZIP code</label><input id="zip" placeholder="12345" autocomplete="postal-code" /></div>
+              <div class="col"><label for="phone">Phone (optional)</label><input id="phone" placeholder="(123) 456‑7890" autocomplete="tel" /></div>
+            </div>
+
+            <div style="margin-bottom:8px"><label for="notes">Quick note (what you want / trade area)</label><textarea id="notes" placeholder="e.g. new driveway, front porch redesign, landscaping"></textarea></div>
+
+            <!-- Honeypot anti-spam (hidden) -->
+            <input id="hp_email" name="hp_email" style="display:none" tabindex="-1" autocomplete="off" />
+
+            <div id="recaptcha-container" style="margin:6px 0"></div>
+
+            <div style="display:flex;gap:8px;align-items:center">
+              <button id="submit" type="button" class="btn btn-primary"><span id="submit-spin" class="hidden spinner" aria-hidden="true"></span><span id="submit-text">Join early access</span></button>
+              <div id="form-msg" class="small" aria-live="polite"></div>
+            </div>
+
+            <div class="small" style="margin-top:8px">By joining you agree to occasional emails about the beta. We will not sell your info.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mock" id="mock-area">Coming soon preview</div>
+    </header>
+
+    <section class="features" aria-label="Why">
+      <div class="feature"><strong>For Homeowners</strong><p class="small">See AI‑generated previews, get multiple verified local contractor bids, choose the best quote.</p></div>
+      <div class="feature"><strong>For Contractors</strong><p class="small">Receive packaged job orders with AI previews—bid competitively and win better leads.</p></div>
+      <div class="feature"><strong>What we do</strong><p class="small">Visual previews → collected interest → routed job packages → secure payments.</p></div>
+    </section>
+
+    <section class="card">
+      <strong>How validation works (what we’re testing)</strong>
+      <ol><li>AI preview from a homeowner photo.</li><li>Show preview to homeowner & collect interest.</li><li>Send packaged job to contractors & collect bids.</li></ol>
+      <div id="validation-note" class="small" style="margin-top:8px;display:none">Goal: confirm homeowners want previews and contractors will bid. Timeline: 6–8 weeks.</div>
+    </section>
+
+    <div class="admin">
+      <strong>Signups collected (private — visible only on this page)</strong>
+      <div class="admin-actions">
+        <button id="export-csv" class="btn">Export CSV</button>
+        <button id="clear-data" class="btn btn-ghost">Clear data</button>
+        <button id="download-template" class="btn">Download CSV template</button>
+        <button id="copy-scripts" class="btn btn-ghost">Copy outreach scripts</button>
+      </div>
+
+      <div style="margin-top:12px">
+        <div><strong>Active headline variant:</strong> <span id="active-variant" class="small"></span></div>
+        <div style="margin-top:6px"><strong>Variant counts:</strong> <span id="variant-counts" class="small"></span></div>
+      </div>
+
+      <div style="margin:8px 0"><div id="signups-list" class="small"></div></div>
+
+      <details style="margin-top:12px">
+        <summary><strong>Outreach DM scripts & Google Sheet template</strong></summary>
+        <pre class="snip" id="scripts-pre">HOMEOWNER DM:
+Hi — I’m testing a free tool that generates a quick AI preview... (shorten for DM)
+
+CONTRACTOR DM:
+Hi — I run a pilot that sends packaged homeowner job requests with AI previews... (shorten for DM)
+
+Google Sheet columns:
+timestamp,role,name,email,zip,phone,notes,contacted_date,interview_notes,interest_level
+        </pre>
+      </details>
+    </div>
+
+    <footer>VerifiedContractors.com — Coming soon • <a href="#">Privacy</a> • <a href="#">Contact</a></footer>
+  </div>
+
+  <script>
+    const signupKey = 'vc_signups_v1';
+    const variants = [
+      { id:'A', headline:'See your home reimagined — free AI previews + real quotes', cta:'Get early access' },
+      { id:'B', headline:'Want a better-looking home? See AI previews and get contractor bids', cta:'Request a preview' },
+      { id:'C', headline:'AI previews + verified contractors — get quotes in days', cta:'Join the waitlist' }
+    ];
+
+    function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function loadSignups(){ return JSON.parse(localStorage.getItem(signupKey) || '[]'); }
+    function saveSignups(arr){ localStorage.setItem(signupKey, JSON.stringify(arr)); displaySignups(); }
+
+    function displaySignups(){
+      const list = loadSignups();
+      const container = document.getElementById('signups-list');
+      if(!container) return;
+      if(list.length===0){ container.innerHTML = '<div class="small">No signups yet.</div>'; return; }
+      container.innerHTML = '<table><thead><tr><th>Name</th><th>Role</th><th>Email</th><th>ZIP</th><th>Notes</th></tr></thead><tbody>'
+        + list.map(s => `<tr><td>${escapeHtml(s.name)}</td><td>${escapeHtml(s.role)}</td><td>${escapeHtml(s.email)}</td><td>${escapeHtml(s.zip)}</td><td>${escapeHtml(s.notes)}</td></tr>`).join('') + '</tbody></table>';
+    }
+
+    function chooseVariant(){
+      const key = 'vc_variant';
+      let v = localStorage.getItem(key);
+      if(!v){ v = variants[Math.floor(Math.random()*variants.length)].id; localStorage.setItem(key,v); }
+      const chosen = variants.find(x=>x.id===v);
+      if(chosen){
+        document.getElementById('hero-headline').innerText = chosen.headline;
+        document.getElementById('submit-text').innerText = 'Join early access';
+        document.getElementById('active-variant').innerText = chosen.id + ' — ' + chosen.cta;
+      }
+      const counts = JSON.parse(localStorage.getItem('vc_variant_counts')||'{}');
+      counts[v] = (counts[v]||0) + 1;
+      localStorage.setItem('vc_variant_counts', JSON.stringify(counts));
+      document.getElementById('variant-counts').innerText = JSON.stringify(counts);
+    }
+
+    function renderRecaptcha(){
+      if(typeof RECAPTCHA_SITE_KEY === 'undefined' || !RECAPTCHA_SITE_KEY) return;
+      const c = document.getElementById('recaptcha-container');
+      if(!c) return;
+      c.innerHTML = '<div class="g-recaptcha" data-sitekey="'+RECAPTCHA_SITE_KEY+'"></div>';
+    }
+
+    function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    // ensure UI can never be left in a "loading" state
+    function initUI(){
+      const btn = document.getElementById('submit');
+      const spin = document.getElementById('submit-spin');
+      const txt = document.getElementById('submit-text');
+      const msg = document.getElementById('form-msg');
+      try{ if(btn) btn.disabled = false; }catch(e){}
+      try{ if(spin) spin.classList.add('hidden'); }catch(e){}
+      try{ if(txt) txt.style.opacity = '1'; }catch(e){}
+      try{ if(msg) msg.textContent = ''; }catch(e){}
+      console.log('[ui] initUI executed');
+    }
+
+    // instrumented submitHandler: logs steps and always restores UI
+    async function submitHandler(e){
+      e && e.preventDefault && e.preventDefault();
+      const btn = document.getElementById('submit');
+      const spin = document.getElementById('submit-spin');
+      const txt = document.getElementById('submit-text');
+      const msg = document.getElementById('form-msg');
+      console.log('[signup] start');
+      try {
+        const role = document.getElementById('role')?.value || '';
+        const name = (document.getElementById('name')?.value || '').trim();
+        const email = (document.getElementById('email')?.value || '').trim();
+        const zip = (document.getElementById('zip')?.value || '').trim();
+        const phone = (document.getElementById('phone')?.value || '').trim();
+        const notes = (document.getElementById('notes')?.value || '').trim();
+        const honeypot = (document.getElementById('hp_email')?.value || '').trim();
+        console.log('[signup] values', { role, name, email, zip, phone });
+
+        if(honeypot){ msg.textContent='Invalid submission.'; msg.style.color='crimson'; console.log('[signup] honeypot'); return; }
+        if(!email || !isValidEmail(email)){ msg.textContent='Please enter a valid email.'; msg.style.color='crimson'; console.log('[signup] invalid email'); return; }
+
+        btn.disabled = true; spin.classList.remove('hidden'); txt.style.opacity = '0.6'; msg.textContent='';
+
+        const record = { ts:new Date().toISOString(), variant: localStorage.getItem('vc_variant')||'', role, name, email, zip, phone, notes };
+        const signups = loadSignups(); signups.push(record); saveSignups(signups);
+        console.log('[signup] saved local');
+
+        if(typeof WEB_APP_URL !== 'undefined' && WEB_APP_URL && WEB_APP_URL.indexOf('http')===0){
+          try {
+            console.log('[signup] posting to webhook', WEB_APP_URL);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(()=>controller.abort(), 8000);
+
+            // send as application/x-www-form-urlencoded to avoid CORS preflight
+            const params = new URLSearchParams();
+            Object.keys(record).forEach(k => params.append(k, record[k] || ''));
+
+            const res = await fetch(WEB_APP_URL, {
+              method: 'POST',
+              body: params,
+              signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+            if(!res.ok){
+              const text = await res.text().catch(()=>'<no body>');
+              console.warn('[signup] webhook returned', res.status, text);
+              msg.textContent = 'Saved locally but server save failed.'; msg.style.color='orange';
+            } else {
+              console.log('[signup] webhook ok', await res.text().catch(()=>'<no body>'));
+            }
+          } catch (err) {
+            console.warn('[signup] webhook error', err);
+            msg.textContent = 'Saved locally; webhook unavailable.'; msg.style.color='orange';
+          }
+        }
+
+        // Mailchimp (non-blocking)
+        if(typeof MAILCHIMP_URL !== 'undefined' && MAILCHIMP_URL){
+          try {
+            console.log('[signup] opening mailchimp', MAILCHIMP_URL);
+            const form = document.createElement('form');
+            form.action = MAILCHIMP_URL;
+            form.method = 'POST';
+            form.target = '_blank';
+            const add = (n,v)=>{ const i=document.createElement('input'); i.type='hidden'; i.name=n; i.value=v||''; form.appendChild(i); };
+            add('EMAIL', record.email);
+            add('FNAME', record.name);
+            add('ZIP', record.zip);
+            add('SOURCE', 'landing');
+            add('redirect', MAILCHIMP_REDIRECT);
+            document.body.appendChild(form); form.submit(); form.remove();
+            console.log('[signup] mailchimp opened');
+          } catch (e){ console.warn('[signup] mailchimp failed', e); }
+        }
+
+        msg.innerHTML = 'Thanks — we saved your spot. Check your email to confirm subscription. <span class="msg-success">Saved locally.</span>';
+        msg.style.color='green';
+        if (typeof gtag === 'function'){ try{ gtag('event','sign_up',{method:'landing_page'}); console.log('[signup] gtag event'); }catch(e){console.warn('[signup] gtag error', e); } }
+
+      } catch (err) {
+        console.error('[signup] uncaught error', err);
+        if(!msg.textContent){ msg.textContent='An error occurred. Try again.'; msg.style.color='crimson'; }
+      } finally {
+        console.log('[signup] restore UI');
+        try{ if(btn) btn.disabled = false; }catch(e){}
+        try{ if(spin) spin.classList.add('hidden'); }catch(e){}
+        try{ if(txt) txt.style.opacity = '1'; }catch(e){}
+      }
+    }
+
+    // ensure admin export/template handlers exist
+    function registerAdminHandlers(){
+      document.getElementById('export-csv')?.addEventListener('click', ()=>{
+        const rows = loadSignups(); if(rows.length===0){ alert('No signups yet.'); return; }
+        const header = ['timestamp','variant','role','name','email','zip','phone','notes'];
+        const csv = [header.join(',')].concat(rows.map(r => header.map(k => `"${((r[k]||'')+'').toString().replace(/"/g,'""')}"`).join(','))).join('\r\n');
+        const blob = new Blob([csv], {type:'text/csv'}); const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'vc_signups.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      });
+
+      document.getElementById('download-template')?.addEventListener('click', ()=>{
+        const header = ['timestamp','role','name','email','zip','phone','notes','contacted_date','interview_notes','interest_level'];
+        const blob = new Blob([header.join(',')+'\r\n'], {type:'text/csv'}); const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'vc_template.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      });
+
+      document.getElementById('copy-scripts')?.addEventListener('click', ()=>{
+        const txt = document.getElementById('scripts-pre')?.innerText || '';
+        navigator.clipboard.writeText(txt).then(()=> alert('Scripts copied to clipboard.')).catch(()=> alert('Copy failed'));
+      });
+
+      document.getElementById('clear-data')?.addEventListener('click', ()=>{
+        if(!confirm('Clear all saved signups from this browser?')) return;
+        localStorage.removeItem(signupKey);
+        displaySignups();
+      });
+    }
+
+    // setup handlers and UI (runs immediately if DOM already ready)
+    function setupPage(){
+      const s = document.getElementById('submit');
+      if(s){ s.removeEventListener('click', submitHandler); s.addEventListener('click', submitHandler); }
+      chooseVariant();
+      renderRecaptcha();
+      displaySignups();
+      registerAdminHandlers();
+      initUI();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupPage);
+    } else {
+      setupPage();
+    }
+  </script>
+</body>
+</html>
